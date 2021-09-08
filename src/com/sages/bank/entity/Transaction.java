@@ -1,5 +1,6 @@
 package com.sages.bank.entity;
 
+import com.sages.bank.enums.TransactionStatus;
 import com.sages.bank.enums.TransactionType;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ public class Transaction {
     private LocalDateTime tDate;
     private BigDecimal amount;
     private TransactionType transactionType;
+    private TransactionStatus status = TransactionStatus.UNPROCESSED;
 
     public Transaction(BigDecimal txAmount,TransactionType type){
         tDate = LocalDateTime.now();
@@ -48,5 +50,13 @@ public class Transaction {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public TransactionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
     }
 }

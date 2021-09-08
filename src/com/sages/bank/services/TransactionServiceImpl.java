@@ -2,6 +2,7 @@ package com.sages.bank.services;
 
 import com.sages.bank.entity.Account;
 import com.sages.bank.entity.Transaction;
+import com.sages.bank.enums.TransactionStatus;
 import com.sages.bank.enums.TransactionType;
 import com.sages.bank.exceptions.BankTransactionException;
 
@@ -19,6 +20,7 @@ public class TransactionServiceImpl implements TransactionService{
             newBalance = account.getBalance().subtract(tx.getAmount());
         }
         account.setBalance(newBalance);
+        tx.setStatus(TransactionStatus.SUCCESSFUL);
         account.getTransaction().add(tx);
         return newBalance;
     }
@@ -26,10 +28,10 @@ public class TransactionServiceImpl implements TransactionService{
     private void validateTransaction(Account account ,Transaction tx) throws BankTransactionException {
         if (account == null || tx == null){
             throw new BankTransactionException("Account is reqired");
-
         }
-        if (tx.getTransactionType().equals(TransactionType.CREDIT)
-                && tx.getAmount().compareTo(BigDecimal.ZERO)<BigDecimal.ZERO.intValue()){
+        tx.setStatus(TransactionStatus.PENDING);
+        if (tx.getAmount().compareTo(BigDecimal.ZERO)<BigDecimal.ZERO.intValue()){
+            tx.setStatus(TransactionStatus.FAILED);
             throw new BankTransactionException("Credit amount cannot be negative");
         }
     }
