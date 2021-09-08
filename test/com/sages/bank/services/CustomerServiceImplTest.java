@@ -21,6 +21,7 @@ class CustomerServiceImplTest {
     @AfterEach
     void tearDown() {
         customerService = null;
+        accountService = null;
     }
 
     @Test
@@ -82,6 +83,7 @@ class CustomerServiceImplTest {
             Account iseSavings = new SavingsAccount();
             Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
             BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
+            assertEquals(balance,iseSavings.getBalance());
             assertNotNull(ise.getSavingsAccount());
             boolean addedAccount = customerService.addAccount(ise,iseSavings);
             assertTrue(addedAccount);
