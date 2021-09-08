@@ -66,7 +66,7 @@ class CustomerServiceImplTest {
             BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
             assertNull(ise.getSavingsAccount());
             customerService.addAccount(ise,iseSavings);
-            ise.setSavingsAccount(iseSavings);
+//            ise.setSavingsAccount(iseSavings);
             assertNotNull(ise.getSavingsAccount());
         } catch (BankException e) {
             e.printStackTrace();
@@ -80,6 +80,30 @@ class CustomerServiceImplTest {
             Customer ise = customerService.findCustomer(iseBvn.longValue());
             assertNotNull(ise);
             Account iseSavings = new SavingsAccount();
+            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
+            BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
+            assertNotNull(ise.getSavingsAccount());
+            boolean addedAccount = customerService.addAccount(ise,iseSavings);
+            assertTrue(addedAccount);
+            assertNotNull(ise.getSavingsAccount());
+        } catch (BankException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void addCurrentAccount(){
+        BigDecimal iseBvn = new BigDecimal(10001100001L);
+        try {
+            Customer ise = customerService.findCustomer(iseBvn.longValue());
+            assertNotNull(ise);
+            Account iseCurrent = new CurrentAccount();
+            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
+            BigDecimal balance = accountService.addTransaction(iseCurrent,initialDeposit);
+            assertNull(ise.getCurrentAccount());
+            boolean addedAccount = customerService.addAccount(ise,iseCurrent);
+            assertTrue(addedAccount);
+            assertNotNull(ise.getCurrentAccount());
         } catch (BankException e) {
             e.printStackTrace();
         }

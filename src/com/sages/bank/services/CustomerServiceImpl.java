@@ -2,6 +2,7 @@ package com.sages.bank.services;
 
 import com.sages.bank.entity.Account;
 import com.sages.bank.entity.Customer;
+import com.sages.bank.enums.AccountType;
 import com.sages.bank.exceptions.BankException;
 import com.sages.bank.repository.Customerdb;
 
@@ -26,6 +27,13 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public boolean addAccount(Customer customer, Account account) {
+        if(account.getClass().getSimpleName().equalsIgnoreCase(AccountType.SAVINGSACCOUNT.toString())){
+            customer.setSavingsAccount(account);
+            return true;
+        }else if(account.getClass().getSimpleName().equalsIgnoreCase(AccountType.CURRENTACCOUNT.toString())){
+            customer.setCurrentAccount(account);
+            return true;
+        }
         return false;
     }
 }
