@@ -8,7 +8,7 @@ import com.sages.bank.exceptions.BankTransactionException;
 
 import java.math.BigDecimal;
 
-public class TransactionServiceImpl implements TransactionService{
+public class AccountServiceImpl implements AccountService {
 
     @Override
     public BigDecimal addTransaction(Account account, Transaction tx) throws BankTransactionException {

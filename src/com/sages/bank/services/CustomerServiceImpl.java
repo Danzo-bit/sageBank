@@ -23,4 +23,9 @@ public class CustomerServiceImpl implements CustomerService{
         }
         return null;
     }
+
+    @Override
+    public boolean addAccount(Customer customer, Account account) {
+        return false;
+    }
 }

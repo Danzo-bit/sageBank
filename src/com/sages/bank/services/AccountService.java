@@ -6,6 +6,6 @@ import com.sages.bank.exceptions.BankTransactionException;
 
 import java.math.BigDecimal;
 
-public interface TransactionService {
+public interface AccountService {
      BigDecimal addTransaction(Account account, Transaction tx) throws BankTransactionException;
 }

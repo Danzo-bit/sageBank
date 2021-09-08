@@ -66,4 +66,16 @@ class CustomerServiceImplTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    void addAccount(){
+        BigDecimal iseBvn = new BigDecimal(10001100001L);
+        try {
+            Customer ise = customerService.findCustomer(iseBvn.longValue());
+            assertNotNull(ise);
+            Account iseSavings = new SavingsAccount(BigDecimal.valueOf(500000));
+        } catch (BankException e) {
+            e.printStackTrace();
+        }
+    }
 }

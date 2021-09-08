@@ -30,10 +30,8 @@ public abstract class Account {
     }
 
     public void addTransaction(Transaction tx){
-        if (tx != null && tx.getTransactionType().equals(TransactionType.CREDIT)){
-            BigDecimal newBalance = balance.add(tx.getAmount());
-        }
-        transactions.add(tx);
+       this.getTransaction().add(tx);
+
     }
     public List<Transaction> getTransaction(){
         return transactions;
