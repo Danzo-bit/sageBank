@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class Account {
     private Long accountNumber;
 
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
     private List<Transaction> transactions = new ArrayList<>();
 
     public Long getAccountNumber() {

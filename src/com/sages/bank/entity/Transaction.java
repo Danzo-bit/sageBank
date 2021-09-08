@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Transaction {
     private Long id;
     private LocalDateTime tDate;
-    private BigDecimal amount;
+    private BigDecimal amount ;
     private TransactionType transactionType;
     private TransactionStatus status = TransactionStatus.UNPROCESSED;
 

@@ -17,10 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountServiceImplTest {
     AccountServiceImpl accountService;
     Account johnSavings;
+    Transaction initialDeposit;
     @BeforeEach
     void setUp() {
         accountService = new AccountServiceImpl();
-       johnSavings = new SavingsAccount(BigDecimal.valueOf(10000));
+       johnSavings = new SavingsAccount();
+        initialDeposit = new Transaction(BigDecimal.valueOf(10000),TransactionType.CREDIT);
     }
 
     @AfterEach
@@ -31,12 +33,12 @@ class AccountServiceImplTest {
     @Test
     public void addTransaction() {
 
-        assertEquals(10000,johnSavings.getBalance().intValue());
-        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
+        assertEquals(0,johnSavings.getBalance().intValue());
+//        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
 
         try {
             BigDecimal newBalance = accountService.addTransaction(johnSavings,initialDeposit);
-            assertEquals(15000, johnSavings.getBalance().intValue());
+            assertEquals(10000, johnSavings.getBalance().intValue());
         } catch (BankTransactionException e) {
             e.printStackTrace();
         }
@@ -47,8 +49,9 @@ class AccountServiceImplTest {
 
     @Test
     public void addTransactionWithNegativeCredit() {
-        assertEquals(10000,johnSavings.getBalance().intValue());
-        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+        assertEquals(0,johnSavings.getBalance().intValue());
+//        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+        initialDeposit.setAmount(BigDecimal.valueOf(-5000));
         assertThrows(BankTransactionException.class, ()-> accountService.addTransaction(johnSavings,initialDeposit));
         assertEquals(TransactionStatus.FAILED,initialDeposit.getStatus());
         assertEquals(0,johnSavings.getTransaction().size());
@@ -57,7 +60,7 @@ class AccountServiceImplTest {
     @Test
     public void addTransactionWithLargeCredit() {
         BigDecimal veryLargeCredit = new BigDecimal("10000000000000000000");
-        assertEquals(10000,johnSavings.getBalance().intValue());
+        assertEquals(0,johnSavings.getBalance().intValue());
         Transaction initialDeposit = new Transaction(veryLargeCredit, TransactionType.CREDIT);
 
         try {
@@ -77,13 +80,13 @@ class AccountServiceImplTest {
 
     @Test
     public void addTransactionWithAccount() {
-        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+//        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
         assertThrows(BankTransactionException.class, ()-> accountService.addTransaction(null,initialDeposit));
     }
 
     @Test
      void addTransactionWithNullTransaction() {
-        assertEquals(10000,johnSavings.getBalance().intValue());
+        assertEquals(0,johnSavings.getBalance().intValue());
         Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
         assertThrows(BankTransactionException.class, ()-> accountService.addTransaction(johnSavings,null));
         assertEquals(TransactionStatus.UNPROCESSED,initialDeposit.getStatus());
@@ -91,12 +94,15 @@ class AccountServiceImplTest {
 
     @Test
     void addDebitTransaction(){
-        Transaction withdrawal = new Transaction(BigDecimal.valueOf(3000),TransactionType.DEBIT);
+
         try {
+            Transaction withdrawal = new Transaction(BigDecimal.valueOf(3000),TransactionType.DEBIT);
+            accountService.addTransaction(johnSavings,initialDeposit);
             assertEquals(10000,johnSavings.getBalance().intValue());
+            assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
             BigDecimal ewBalance = accountService.addTransaction(johnSavings,withdrawal);
             assertEquals(7000,johnSavings.getBalance().intValue());
-            assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
+            assertEquals(2,johnSavings.getTransaction().size());
         } catch (BankTransactionException e) {
             e.printStackTrace();
         }
@@ -106,10 +112,12 @@ class AccountServiceImplTest {
     void addDebitTransactionWithAmountHigherThanBalance(){
         Transaction withdrawal = new Transaction(BigDecimal.valueOf(12000),TransactionType.DEBIT);
         try {
+            accountService.addTransaction(johnSavings,initialDeposit);
             assertEquals(10000,johnSavings.getBalance().intValue());
+            assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
             BigDecimal ewBalance = accountService.addTransaction(johnSavings,withdrawal);
             assertEquals(-2000,johnSavings.getBalance().intValue());
-            assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
+            assertEquals(2,johnSavings.getTransaction().size());
         } catch (BankTransactionException e) {
             e.printStackTrace();
         }
@@ -117,7 +125,7 @@ class AccountServiceImplTest {
 
     @Test
     void addDebitTransactionWithNegativeDebit(){
-            assertEquals(10000,johnSavings.getBalance().intValue());
+            assertEquals(0,johnSavings.getBalance().intValue());
             Transaction withdrawal = new Transaction(BigDecimal.valueOf(-7000),TransactionType.DEBIT);
             assertThrows(BankTransactionException.class,()-> accountService.addTransaction(johnSavings,withdrawal));
             assertTrue(johnSavings.getTransaction().isEmpty());

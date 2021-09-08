@@ -8,14 +8,9 @@ import java.math.BigDecimal;
 public class SavingsAccount extends Account{
     private double interestRate;
 
-    public SavingsAccount(BigDecimal initialDeposit){
-        setAccountNumber(Customerdb.generateAccountNumber());
-        setBalance(initialDeposit);
-    }
 
-    public SavingsAccount(Transaction initialDeposit){
+    public SavingsAccount(){
         setAccountNumber(Customerdb.generateAccountNumber());
-
     }
 
 

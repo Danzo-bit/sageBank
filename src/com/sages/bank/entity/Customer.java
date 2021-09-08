@@ -51,4 +51,20 @@ public abstract class Customer {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Account getSavingsAccount() {
+        return savingsAccount;
+    }
+
+    public void setSavingsAccount(Account savingsAccount) {
+        this.savingsAccount = savingsAccount;
+    }
+
+    public Account getCurrentAccount() {
+        return currentAccount;
+    }
+
+    public void setCurrentAccount(Account currentAccount) {
+        this.currentAccount = currentAccount;
+    }
 }

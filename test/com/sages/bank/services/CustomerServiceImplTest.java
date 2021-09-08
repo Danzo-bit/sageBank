@@ -1,9 +1,7 @@
 package com.sages.bank.services;
 
-import com.sages.bank.entity.Account;
-import com.sages.bank.entity.Customer;
-import com.sages.bank.entity.RetailCustomer;
-import com.sages.bank.entity.SavingsAccount;
+import com.sages.bank.entity.*;
+import com.sages.bank.enums.TransactionType;
 import com.sages.bank.exceptions.BankException;
 import org.junit.jupiter.api.*;
 
@@ -13,9 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerServiceImplTest {
     private CustomerService customerService;
+    private AccountService accountService;
     @BeforeEach
     void setUp() {
         customerService = new CustomerServiceImpl();
+        accountService = new AccountServiceImpl();
     }
 
     @AfterEach
@@ -45,7 +45,7 @@ class CustomerServiceImplTest {
     @Test
     void openAccountWithNullCustomer(){
         assertThrows(BankException.class,
-                ()->customerService.openAccount(null,new SavingsAccount(BigDecimal.ZERO)));
+                ()->customerService.openAccount(null,new SavingsAccount()));
     }
 
     @Test
@@ -61,7 +61,13 @@ class CustomerServiceImplTest {
         try {
             Customer ise = customerService.findCustomer(iseBvn.longValue());
             assertNotNull(ise);
-            Account iseSavings = new SavingsAccount(BigDecimal.valueOf(500000));
+            Account iseSavings = new SavingsAccount();
+            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
+            BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
+            assertNull(ise.getSavingsAccount());
+            customerService.addAccount(ise,iseSavings);
+            ise.setSavingsAccount(iseSavings);
+            assertNotNull(ise.getSavingsAccount());
         } catch (BankException e) {
             e.printStackTrace();
         }
@@ -73,7 +79,7 @@ class CustomerServiceImplTest {
         try {
             Customer ise = customerService.findCustomer(iseBvn.longValue());
             assertNotNull(ise);
-            Account iseSavings = new SavingsAccount(BigDecimal.valueOf(500000));
+            Account iseSavings = new SavingsAccount();
         } catch (BankException e) {
             e.printStackTrace();
         }
