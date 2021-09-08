@@ -34,6 +34,8 @@ public abstract class Account {
             BigDecimal newBalance = balance.add(tx.getAmount());
         }
         transactions.add(tx);
-
+    }
+    public List<Transaction> getTransaction(){
+        return transactions;
     }
 }

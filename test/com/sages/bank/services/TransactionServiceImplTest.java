@@ -10,32 +10,90 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionServiceImplTest {
-    TransactionServiceImpl tx;
+    TransactionServiceImpl txService;
+    Account johnSavings;
     @BeforeEach
     void setUp() {
-        tx = new TransactionServiceImpl();
+        txService = new TransactionServiceImpl();
+       johnSavings = new SavingsAccount(BigDecimal.valueOf(10000));
     }
 
     @AfterEach
     void tearDown() {
+        johnSavings = null;
     }
 
     @Test
     public void addTransaction() {
-        Account johnSavings = new SavingsAccount(BigDecimal.valueOf(10000));
+
         assertEquals(10000,johnSavings.getBalance().intValue());
         Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
 
         try {
-            BigDecimal newBalance = tx.addTransaction(johnSavings,initialDeposit);
+            BigDecimal newBalance = txService.addTransaction(johnSavings,initialDeposit);
             assertEquals(15000, johnSavings.getBalance().intValue());
         } catch (BankTransactionException e) {
             e.printStackTrace();
         }
-
+        Transaction txHistory = johnSavings.getTransaction().get(0);
+        assertEquals(initialDeposit,txHistory);
+        assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
     }
+
+    @Test
+    public void addTransactionWithNegativeCredit() {
+        assertEquals(10000,johnSavings.getBalance().intValue());
+        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+        assertThrows(BankTransactionException.class, ()-> txService.addTransaction(johnSavings,initialDeposit));
+        assertEquals(0,johnSavings.getTransaction().size());
+    }
+
+    @Test
+    public void addTransactionWithLargeCredit() {
+        BigDecimal veryLargeCredit = new BigDecimal("10000000000000000000");
+        assertEquals(10000,johnSavings.getBalance().intValue());
+        Transaction initialDeposit = new Transaction(veryLargeCredit, TransactionType.CREDIT);
+
+        try {
+            BigDecimal newBalance = txService.addTransaction(johnSavings,initialDeposit);
+            assertEquals(newBalance, johnSavings.getBalance());
+        } catch (BankTransactionException e) {
+            e.printStackTrace();
+        }
+        Transaction txHistory = johnSavings.getTransaction().get(0);
+        assertEquals(initialDeposit,txHistory);
+        assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
+    }
+
+    @Test
+    public void addTransactionWithAccount() {
+        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+        assertThrows(BankTransactionException.class, ()-> txService.addTransaction(null,initialDeposit));
+    }
+
+    @Test
+     void addTransactionWithNullTransaction() {
+        assertEquals(10000,johnSavings.getBalance().intValue());
+        Transaction initialDeposit = new Transaction(BigDecimal.valueOf(-5000), TransactionType.CREDIT);
+        assertThrows(BankTransactionException.class, ()-> txService.addTransaction(johnSavings,null));
+    }
+
+    @Test
+    void addDebitTransaction(){
+        Transaction withdrawal = new Transaction(BigDecimal.valueOf(3000),TransactionType.DEBIT);
+        try {
+            assertEquals(10000,johnSavings.getBalance().intValue());
+            BigDecimal ewBalance = txService.addTransaction(johnSavings,withdrawal);
+            assertEquals(7000,johnSavings.getBalance().intValue());
+            assertEquals(BigDecimal.ONE.intValue(),johnSavings.getTransaction().size());
+        } catch (BankTransactionException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
