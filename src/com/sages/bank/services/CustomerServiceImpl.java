@@ -26,8 +26,11 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public boolean addAccount(Customer customer, Account account) {
+    public boolean addAccount(Customer customer, Account account) throws BankException {
         if(account.getClass().getSimpleName().equalsIgnoreCase(AccountType.SAVINGSACCOUNT.toString())){
+            if (customer.getSavingsAccount()!=null){
+                throw new BankException();
+            }
             customer.setSavingsAccount(account);
             return true;
         }else if(account.getClass().getSimpleName().equalsIgnoreCase(AccountType.CURRENTACCOUNT.toString())){

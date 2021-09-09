@@ -3,6 +3,7 @@ package com.sages.bank.services;
 import com.sages.bank.entity.*;
 import com.sages.bank.enums.TransactionType;
 import com.sages.bank.exceptions.BankException;
+import com.sages.bank.repository.Customerdb;
 import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
@@ -20,8 +21,8 @@ class CustomerServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        customerService = null;
-        accountService = null;
+//        customerService = null;
+//        accountService = null;
     }
 
     @Test
@@ -63,12 +64,12 @@ class CustomerServiceImplTest {
             Customer ise = customerService.findCustomer(iseBvn.longValue());
             assertNotNull(ise);
             Account iseSavings = new SavingsAccount();
-            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
-            BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
-            assertNull(ise.getSavingsAccount());
-            customerService.addAccount(ise,iseSavings);
-//            ise.setSavingsAccount(iseSavings);
-            assertNotNull(ise.getSavingsAccount());
+//            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000), TransactionType.CREDIT);
+//            BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
+//            assertNull(ise.getSavingsAccount());
+//            customerService.addAccount(ise,iseSavings);
+////            ise.setSavingsAccount(iseSavings);
+//            assertNotNull(ise.getSavingsAccount());
         } catch (BankException e) {
             e.printStackTrace();
         }
@@ -84,7 +85,7 @@ class CustomerServiceImplTest {
             Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
             BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
             assertEquals(balance,iseSavings.getBalance());
-            assertNotNull(ise.getSavingsAccount());
+            assertNull(ise.getSavingsAccount());
             boolean addedAccount = customerService.addAccount(ise,iseSavings);
             assertTrue(addedAccount);
             assertNotNull(ise.getSavingsAccount());
@@ -102,10 +103,34 @@ class CustomerServiceImplTest {
             Account iseCurrent = new CurrentAccount();
             Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
             BigDecimal balance = accountService.addTransaction(iseCurrent,initialDeposit);
-            assertNull(ise.getCurrentAccount());
+            assertEquals(balance,iseCurrent.getBalance());
+            assertEquals(1,iseCurrent.getTransaction().size());
             boolean addedAccount = customerService.addAccount(ise,iseCurrent);
             assertTrue(addedAccount);
             assertNotNull(ise.getCurrentAccount());
+        } catch (BankException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void addSavingsAccountForExistingSavingsAccount(){
+        BigDecimal iseBvn = new BigDecimal(10001100001L);
+        try {
+            Customer ise = customerService.findCustomer(iseBvn.longValue());
+            assertNotNull(ise);
+            Account iseSavings = new SavingsAccount();
+            Transaction initialDeposit = new Transaction(BigDecimal.valueOf(5000),TransactionType.CREDIT);
+            BigDecimal balance = accountService.addTransaction(iseSavings,initialDeposit);
+            assertEquals(balance,iseSavings.getBalance());
+            assertNull(ise.getSavingsAccount());
+            boolean addedAccount = customerService.addAccount(ise,iseSavings);
+            assertTrue(addedAccount);
+            assertNotNull(ise.getSavingsAccount());
+
+            Account anotherAccount = new SavingsAccount();
+            assertThrows(BankException.class,()-> customerService.addAccount(ise,anotherAccount));
+
         } catch (BankException e) {
             e.printStackTrace();
         }
